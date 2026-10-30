@@ -1,5 +1,8 @@
 name: Firmware SBOM
 description: Generate SPDX 2.3 and CycloneDX 1.6 SBOMs for a local PlatformIO or Arduino project
+branding:
+  icon: package
+  color: blue
 inputs:
   project:
     description: Firmware project directory
