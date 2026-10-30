@@ -1,0 +1,16 @@
+default_profile: esp32
+profiles:
+  esp32:
+    fqbn: esp32:esp32:esp32
+    platforms:
+      - platform: esp32:esp32 (3.0.7)
+        platform_index_url: https://example.org/package_esp32_index.json
+    libraries:
+      - ArduinoJson (7.2.0)
+      - LocalSensor (1.0.0)
+  avr:
+    fqbn: arduino:avr:uno
+    platforms:
+      - platform: arduino:avr (1.8.6)
+    libraries:
+      - ArduinoJson (6.21.5)

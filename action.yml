@@ -1,0 +1,85 @@
+name: Firmware SBOM
+description: Generate SPDX 2.3 and CycloneDX 1.6 SBOMs for a local PlatformIO or Arduino project
+inputs:
+  project:
+    description: Firmware project directory
+    default: .
+  ecosystem:
+    description: platformio or arduino (auto-detected by default)
+    default: ''
+  env:
+    description: One PlatformIO environment (all by default)
+    default: ''
+  profile:
+    description: One Arduino profile (all by default)
+    default: ''
+  format:
+    description: spdx, cyclonedx or both
+    default: both
+  product-name:
+    description: Product name (project directory name by default)
+    default: ''
+  product-version:
+    description: Product version (unknown by default)
+    default: ''
+  supplier:
+    description: Product supplier
+    default: ''
+  fail-on-unknown:
+    description: Fail after writing SBOMs if any dependency version or licence is unknown
+    default: 'false'
+  output-dir:
+    description: Directory in which to write the SBOMs
+    default: sbom
+  artifact-name:
+    description: Uploaded artifact name
+    default: firmware-sbom
+outputs:
+  directory:
+    description: Absolute directory containing generated SBOMs
+    value: ${{ steps.generate.outputs.directory }}
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install fw-sbom
+      shell: bash
+      run: |
+        venv_dir="$(mktemp -d "$RUNNER_TEMP/fw-sbom.XXXXXX")"
+        python -m venv "$venv_dir"
+        "$venv_dir/bin/python" -m pip install "$GITHUB_ACTION_PATH"
+        echo "FW_SBOM_PYTHON=$venv_dir/bin/python" >> "$GITHUB_ENV"
+    - name: Generate SBOMs
+      id: generate
+      shell: bash
+      env:
+        INPUT_PROJECT: ${{ inputs.project }}
+        INPUT_ECOSYSTEM: ${{ inputs.ecosystem }}
+        INPUT_ENV: ${{ inputs.env }}
+        INPUT_PROFILE: ${{ inputs.profile }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_PRODUCT_NAME: ${{ inputs.product-name }}
+        INPUT_PRODUCT_VERSION: ${{ inputs.product-version }}
+        INPUT_SUPPLIER: ${{ inputs.supplier }}
+        INPUT_FAIL_ON_UNKNOWN: ${{ inputs.fail-on-unknown }}
+        INPUT_OUTPUT_DIR: ${{ inputs.output-dir }}
+      run: |
+        args=("$INPUT_PROJECT" --format "$INPUT_FORMAT" --output-dir "$INPUT_OUTPUT_DIR")
+        [[ -z "$INPUT_ECOSYSTEM" ]] || args+=(--ecosystem "$INPUT_ECOSYSTEM")
+        [[ -z "$INPUT_ENV" ]] || args+=(--env "$INPUT_ENV")
+        [[ -z "$INPUT_PROFILE" ]] || args+=(--profile "$INPUT_PROFILE")
+        [[ -z "$INPUT_PRODUCT_NAME" ]] || args+=(--product-name "$INPUT_PRODUCT_NAME")
+        [[ -z "$INPUT_PRODUCT_VERSION" ]] || args+=(--product-version "$INPUT_PRODUCT_VERSION")
+        [[ -z "$INPUT_SUPPLIER" ]] || args+=(--supplier "$INPUT_SUPPLIER")
+        [[ "$INPUT_FAIL_ON_UNKNOWN" != true ]] || args+=(--fail-on-unknown)
+        "$FW_SBOM_PYTHON" -c 'import os; print("directory=" + os.path.abspath(os.environ["INPUT_OUTPUT_DIR"]))' >> "$GITHUB_OUTPUT"
+        "$FW_SBOM_PYTHON" -m fw_sbom "${args[@]}"
+    - name: Upload SBOMs
+      if: ${{ always() && steps.generate.outputs.directory != '' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ steps.generate.outputs.directory }}/sbom.*.json
+        if-no-files-found: error

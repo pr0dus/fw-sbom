@@ -1,0 +1,6 @@
+{
+  "name": "RegistrySensor",
+  "version": "1.2.7",
+  "license": "MIT",
+  "repository": {"type": "git", "url": "https://github.com/acme/registry-sensor.git"}
+}

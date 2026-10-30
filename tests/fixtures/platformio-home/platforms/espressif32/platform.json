@@ -1,0 +1,8 @@
+{
+  "name": "espressif32",
+  "version": "6.8.1",
+  "license": "Apache-2.0",
+  "repository": {"url": "https://github.com/platformio/platform-espressif32.git"},
+  "frameworks": {"arduino": {"package": "framework-arduinoespressif32"}},
+  "packages": {"framework-arduinoespressif32": {"version": "~3.20017.0"}}
+}

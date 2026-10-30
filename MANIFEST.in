@@ -1,0 +1,5 @@
+include action.yml TASK-007-fw-sbom.md
+recursive-include tests *.py *.md *.json *.yaml *.ini *.properties *.ino
+recursive-include tests/fixtures/platformio/.pio *.json *.properties
+recursive-include tests/fixtures/unknown/.pio *.json
+include tests/schemas/LICENSE-CycloneDX

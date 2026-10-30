@@ -1,0 +1,8 @@
+The spdx-ids.json data is derived from the enum array in the official
+CycloneDX 1.6 SPDX identifier schema:
+https://raw.githubusercontent.com/CycloneDX/specification/1.6/schema/spdx.schema.json
+
+Source project: CycloneDX (OWASP Foundation and contributors).
+The CycloneDX JSON schemas are published under the Apache License 2.0.
+A copy is included in the distribution as LICENSE-CycloneDX.
+Only JSON formatting was changed when extracting the identifier array.
