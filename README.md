@@ -111,17 +111,16 @@ environments/profiles and installed packages.
 
 ## GitHub Action
 
-The local composite Action installs the CLI and uploads the generated SBOMs.
-It can be used from this checkout on a Linux/macOS runner. No remote repository
-or published package is needed. A firmware build or dependency installation step
-should precede it if installed metadata is wanted.
+The composite Action installs the CLI and uploads the generated SBOMs. It runs
+on Linux/macOS runners. Install your PlatformIO packages first (for example
+`pio pkg install -e esp32`) so installed library versions are included.
 
 ```yaml
 steps:
   - uses: actions/checkout@v4
-  - uses: ./
+  - uses: pr0dus/fw-sbom@v0.1.1
     with:
-      project: tests/fixtures/platformio
+      project: .
       env: esp32
       product-name: Sensor
       product-version: '1.0'
